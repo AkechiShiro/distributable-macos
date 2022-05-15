@@ -44,7 +44,7 @@ download_cmake() {
 }
 
 check_python3() {
-  for filename in /Applications/*;do
+  for filename in /Applications/* $LOC/runtimes/python/*;do
     if [[ "$filename" =~ "Python".* ]];then # regexp for Python 3.XX
       return 1 # Python is installed
      else 
@@ -56,9 +56,9 @@ check_python3() {
 download_install_python3(){
   echo "Downloading Python3"
   download "https://www.python.org/ftp/python/3.10.4/python-3.10.4-macos11.pkg" python3.pkg || return 1
-  echo "Installing Python3 with Universal pkg file (require sudo)"
+  echo "Installing Python3 with Universal pkg file"
   mkdir -p $LOC/runtimes/python
-  sudo installer -pkg python3.pkg -target $LOC/runtimes/python || error "Python installation failed"
+  installer -pkg python3.pkg -target $LOC/runtimes/python || error "Python installation failed"
 }
 
 download_dotnet(){
