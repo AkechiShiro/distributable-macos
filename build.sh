@@ -2,6 +2,10 @@
 set -o nounset # raise error if a var is not defined
 echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
+command -v curl &>/dev/null && CURL_PRESENT=1
+command -v wget &>/dev/null && WGET_PRESENT=1
+echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
+[[ -n CURL_PRESENT ]] && error "CURL is not present and is absolutely required for now"
 MOUNTED_CMAKE_PATH="" # Global for cleanup phase
 UPSTREAM_URL="https://github.com/metacall/core.git" 
 # TODO: Download and add to PATH, dotnet binaries
@@ -16,7 +20,7 @@ CWD="$PWD"
 (mkdir -p "$LOC" && cd "$LOC") || error "cd $LOC failed"
 
 download() {
-  curl -sL "$1 -o $2" || return 1
+  curl -sL "$1" -o "$2" || return 1
 }
 
 get_latest_release() {
@@ -80,7 +84,7 @@ download_dependencies() {
   PYTHON_PRESENT=$?
   echo "Value of Python Present is: $PYTHON_PRESENT"
   if [[ PYTHON_PRESENT -eq 0 ]];then
-	  download_install_python3 || error "Python3 download failed." 
+	  download_install_python3 || error "Python3 download failed" 
   fi
   download_dotnet  || error "Dotnet-sdk download failed"
   download_ruby    || error "Ruby download failed"
