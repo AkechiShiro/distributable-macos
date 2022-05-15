@@ -4,17 +4,18 @@ echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
 command -v curl &>/dev/null && CURL_PRESENT=1
 command -v wget &>/dev/null && WGET_PRESENT=1
-echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
-[[ -n CURL_PRESENT ]] && error "CURL is not present and is absolutely required for now"
-MOUNTED_CMAKE_PATH="" # Global for cleanup phase
-UPSTREAM_URL="https://github.com/metacall/core.git" 
-# TODO: Download and add to PATH, dotnet binaries
 
 error() {
   echo "Error: $1, build stopping, probably dependencies could not be downloaded."
   exit 1
 }
 
+echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
+[[ -n "$CURL_PRESENT" ]] || error "CURL is not present and is absolutely required for now."
+
+MOUNTED_CMAKE_PATH="" # Global for cleanup phase
+UPSTREAM_URL="https://github.com/metacall/core.git" 
+# TODO: Download and add to PATH, dotnet binaries
 LOC="$PWD/metacall"
 CWD="$PWD"
 (mkdir -p "$LOC" && cd "$LOC") || error "cd $LOC failed"
@@ -61,8 +62,8 @@ download_install_python3(){
   echo "Downloading Python3"
   download "https://www.python.org/ftp/python/3.10.4/python-3.10.4-macos11.pkg" python3.pkg || return 1
   echo "Installing Python3 with Universal pkg file"
-  mkdir -p $LOC/runtimes/python
-  installer -pkg python3.pkg -target $LOC/runtimes/python || error "Python installation failed"
+  mkdir -p "$LOC/runtimes/python"
+  sudo installer -pkg python3.pkg -target "$LOC/runtimes/python" || error "Python installation failed"
 }
 
 download_dotnet(){
