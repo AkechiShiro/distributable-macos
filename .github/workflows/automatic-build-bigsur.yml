@@ -10,12 +10,15 @@ jobs:
           chmod +x ./build.sh
           ./build.sh
           unzip -l ./metacall-tarball-macos-x64.zip
-      - name: Upload build tarball production artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: metacall-tarball
-          path: ./metacall-tarball-macos-x64.zip
+  upload-tarball: 
+    name: Upload build tarball production artifacts
+    needs: build-action
+    uses: actions/upload-artifact@v3
+    with:
+      name: metacall-tarball
+      path: ./metacall-tarball-macos-x64.zip
   python-tests:
+    needs: [build-action, upload-tarball]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
