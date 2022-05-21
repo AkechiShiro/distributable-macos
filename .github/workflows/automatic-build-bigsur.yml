@@ -9,15 +9,19 @@ jobs:
         run: | 
           chmod +x ./build.sh
           ./build.sh
-          unzip -l ./metacall-tarball-macos-x64.zip
+          mkdir artifacts && cp ./metacall-tarball-macos-x64.zip artifacts
   upload-tarball: 
     name: Upload build tarball production artifacts
     needs: build-action
-    uses: actions/upload-artifact@v3
-    with:
-      name: metacall-tarball
-      path: ./metacall-tarball-macos-x64.zip
+    runs-on: macos-latest
+    steps:
+      - name: metacall-tarball
+        uses: actions/upload-artifact@v3
+        with:
+          name: metacall-tarball
+          path: ./artifacts/metacall-tarball-macos-x64.zip
   python-tests:
+    name: Python loader tests
     needs: [build-action, upload-tarball]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -28,7 +32,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: metacall-tarball
-      - run: unzip -l ./metacall-tarball-macos-x64.zip
+          path: ./artifacts/metacall-tarball-macos-x64.zip
+      - run: unzip -l ./artifacts/metacall-tarball-macos-x64.zip
       - run: cd /tmp && unzip "/Users/runner/work/distributable-macos/distributable-macos/metacall-tarball-macos-x64.zip"
       - run: echo "print(\"Hello World from Python GitHub Actions\")" > /tmp/py-eval-test.py
       - run: chmod +x /tmp/metacall.sh
