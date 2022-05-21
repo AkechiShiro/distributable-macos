@@ -5,8 +5,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Building MetaCall on MacOS BigSur
-        uses: actions/checkout@v3
-        run: | 
+      - uses: actions/checkout@v3
+      - run: | 
           chmod +x ./build.sh
           ./build.sh
           mkdir artifacts && cp ./metacall-tarball-macos-x64.zip artifacts
@@ -16,10 +16,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: metacall-tarball
-        uses: actions/upload-artifact@v3
-        with:
-          name: metacall-tarball
-          path: ./artifacts/metacall-tarball-macos-x64.zip
+      - uses: actions/upload-artifact@v3
+      - with:
+        - name: metacall-tarball
+        - path: ./artifacts/metacall-tarball-macos-x64.zip
   python-tests:
     name: Python loader tests
     needs: [build-action, upload-tarball]
@@ -29,8 +29,8 @@ jobs:
         os: [macos-latest, macos-12]
     steps:
       - name: Download build/artifact from cache
-        uses: actions/download-artifact@v3
-        with:
+      - uses: actions/download-artifact@v3
+      - with:
           name: metacall-tarball
           path: ./artifacts/metacall-tarball-macos-x64.zip
       - run: unzip -l ./artifacts/metacall-tarball-macos-x64.zip
