@@ -18,8 +18,8 @@ jobs:
       - name: metacall-tarball
       - uses: actions/upload-artifact@v3
       - with:
-        - name: metacall-tarball
-        - path: ./artifacts/metacall-tarball-macos-x64.zip
+        name: metacall-tarball
+        path: ./artifacts/metacall-tarball-macos-x64.zip
   python-tests:
     name: Python loader tests
     needs: [build-action, upload-tarball]
