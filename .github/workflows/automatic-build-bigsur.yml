@@ -4,7 +4,13 @@ jobs:
   build-action:
     runs-on: macos-latest
     steps:
+      - name: Building MetaCall on MacOS BigSur
       - uses: actions/checkout@v3
       - run: chmod +x ./build.sh
       - run: ./build.sh
       - run: unzip -l ./metacall-tarball-macos-x64.zip
+      - name: Upload build tarball production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: metacall-tarball
+          path: ./metacall-tarball-macos-x64.zip
