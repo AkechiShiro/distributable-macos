@@ -6,7 +6,7 @@ jobs:
     steps:
       - name: Building MetaCall on MacOS BigSur
       - uses: actions/checkout@v3
-      - run: |
+      - run: | 
           chmod +x ./build.sh
           ./build.sh
           mkdir artifacts && cp ./metacall-tarball-macos-x64.zip artifacts
@@ -33,7 +33,7 @@ jobs:
         with:
           name: metacall-tarball
           path: ./artifacts/metacall-tarball-macos-x64.zip
-      - run: |
+      - run: | 
           unzip -l ./artifacts/metacall-tarball-macos-x64.zip
           cd /tmp && unzip "/Users/runner/work/distributable-macos/distributable-macos/metacall-tarball-macos-x64.zip"
           echo "print(\"Hello World from Python GitHub Actions\")" > /tmp/py-eval-test.py
