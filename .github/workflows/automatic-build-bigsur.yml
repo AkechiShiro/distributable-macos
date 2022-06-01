@@ -18,7 +18,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with: 
           name: metacall-tarball
-          path: ./metacall-tarball-macos-x64.zip
+          path: build/outputs/metacall-tarball-macos-x64.zip
+          if-no-files-found: error
   python-tests:
     name: Python loader tests
     needs: [build-action, upload-tarball]
