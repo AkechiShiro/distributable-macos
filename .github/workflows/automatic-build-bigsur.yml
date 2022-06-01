@@ -9,12 +9,7 @@ jobs:
       - run: | 
           chmod +x ./build.sh
           ./build.sh
-  upload-tarball: 
-    name: Upload build tarball production artifacts
-    needs: build-action
-    runs-on: macos-latest
-    steps:
-      - name: metacall-tarball
+      - name: Upload build tarball production artifacts
         uses: actions/upload-artifact@v3
         with: 
           name: metacall-tarball
