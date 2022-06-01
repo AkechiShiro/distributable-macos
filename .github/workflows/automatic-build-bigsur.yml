@@ -17,7 +17,7 @@ jobs:
           if-no-files-found: error
   python-tests:
     name: Python loader tests
-    needs: [build-action, upload-tarball]
+    needs: build-action
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
