@@ -27,8 +27,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: metacall-tarball
-          path: ./macos-distributable/macos-distributable/metacall-tarball-macos-x64.zip
+          path: ./metacall-tarball-macos-x64.zip
       - run: | 
+          ls -lah
+          pwd
           unzip -l ./metacall-tarball-macos-x64.zip
           cp ./metacall-tarball-macos-x64.zip /tmp/
           cd /tmp && unzip "./metacall-tarball-macos-x64.zip"
