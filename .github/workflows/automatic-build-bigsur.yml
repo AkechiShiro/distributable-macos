@@ -13,7 +13,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with: 
           name: metacall-tarball
-          path: ./metacall-tarball-macos-x64.zip
+          path: metacall-tarball-macos-x64.zip
           if-no-files-found: error
   python-tests:
     name: Python loader tests
@@ -27,7 +27,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: metacall-tarball
-          path: ./metacall-tarball-macos-x64.zip
+          path: metacall-tarball-macos-x64.zip
       - run: | 
           ls -lah
           pwd
