@@ -27,10 +27,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: metacall-tarball
-          path: metacall-tarball-macos-x64.zip
+          path: tarball
       - run: | 
-          ls -Rlah
-          file metacall-tarball-macos-x64.zip
+          unzip -l tarball/metacall-tarball-macos-x64.zip
           cp metacall-tarball-macos-x64.zip /tmp/
           cd /tmp && unzip "./metacall-tarball-macos-x64.zip"
           echo "print(\"Hello World from Python GitHub Actions\")" > /tmp/py-eval-test.py
