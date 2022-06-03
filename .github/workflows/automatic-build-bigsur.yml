@@ -31,8 +31,8 @@ jobs:
       - run: | 
           ls -lah
           pwd
-          unzip -l ./metacall-tarball-macos-x64.zip
-          cp ./metacall-tarball-macos-x64.zip /tmp/
+          unzip -l metacall-tarball-macos-x64.zip
+          cp metacall-tarball-macos-x64.zip /tmp/
           cd /tmp && unzip "./metacall-tarball-macos-x64.zip"
           echo "print(\"Hello World from Python GitHub Actions\")" > /tmp/py-eval-test.py
           chmod +x /tmp/metacall.sh
