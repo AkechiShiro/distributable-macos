@@ -29,9 +29,8 @@ jobs:
           name: metacall-tarball
           path: metacall-tarball-macos-x64.zip
       - run: | 
-          ls -lah
-          pwd
-          unzip -l metacall-tarball-macos-x64.zip
+          ls -Rlah
+          file metacall-tarball-macos-x64.zip
           cp metacall-tarball-macos-x64.zip /tmp/
           cd /tmp && unzip "./metacall-tarball-macos-x64.zip"
           echo "print(\"Hello World from Python GitHub Actions\")" > /tmp/py-eval-test.py
