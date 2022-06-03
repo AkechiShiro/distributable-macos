@@ -4,8 +4,9 @@ jobs:
   build-action:
     runs-on: macos-latest
     steps:
-      - name: Building MetaCall on MacOS BigSur
+      - name: Checkout upstream MetaCall Distributable MacOS 
         uses: actions/checkout@v3
+      - name: Building MetaCall on MacOS BigSur
       - run: | 
           chmod +x ./build.sh
           ./build.sh
