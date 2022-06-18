@@ -2,26 +2,21 @@
 set -o nounset # raise error if a var is not defined
 echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
-command -v curl &>/dev/null && CURL_PRESENT=1
-command -v wget &>/dev/null && WGET_PRESENT=1
+MOUNTED_CMAKE_PATH="" # Global for cleanup phase
+UPSTREAM_URL="https://github.com/metacall/core.git" 
+# TODO: Download and add to PATH, dotnet binaries
 
 error() {
   echo "Error: $1, build stopping, probably dependencies could not be downloaded."
   exit 1
 }
 
-echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
-[[ -n "$CURL_PRESENT" ]] || error "CURL is not present and is absolutely required for now."
-
-MOUNTED_CMAKE_PATH="" # Global for cleanup phase
-UPSTREAM_URL="https://github.com/metacall/core.git" 
-# TODO: Download and add to PATH, dotnet binaries
 LOC="$PWD/metacall"
 CWD="$PWD"
 (mkdir -p "$LOC" && cd "$LOC") || error "cd $LOC failed"
 
 download() {
-  curl -sL "$1" -o "$2" || return 1
+  curl -sL "$1 -o $2" || return 1
 }
 
 get_latest_release() {
@@ -49,7 +44,7 @@ download_cmake() {
 }
 
 check_python3() {
-  for filename in /Applications/* $LOC/runtimes/python/*;do
+  for filename in /Applications/*;do
     if [[ "$filename" =~ "Python".* ]];then # regexp for Python 3.XX
       return 1 # Python is installed
      else 
@@ -61,9 +56,9 @@ check_python3() {
 download_install_python3(){
   echo "Downloading Python3"
   download "https://www.python.org/ftp/python/3.10.4/python-3.10.4-macos11.pkg" python3.pkg || return 1
-  echo "Installing Python3 with Universal pkg file"
-  mkdir -p "$LOC/runtimes/python"
-  sudo installer -pkg python3.pkg -target "$LOC/runtimes/python" || error "Python installation failed"
+  echo "Installing Python3 with Universal pkg file (require sudo)"
+  mkdir -p $LOC/runtimes/python
+  sudo installer -pkg python3.pkg -target $LOC/runtimes/python || error "Python installation failed"
 }
 
 download_dotnet(){
@@ -85,7 +80,7 @@ download_dependencies() {
   PYTHON_PRESENT=$?
   echo "Value of Python Present is: $PYTHON_PRESENT"
   if [[ PYTHON_PRESENT -eq 0 ]];then
-	  download_install_python3 || error "Python3 download failed" 
+	  download_install_python3 || error "Python3 download failed." 
   fi
   download_dotnet  || error "Dotnet-sdk download failed"
   download_ruby    || error "Ruby download failed"
@@ -105,6 +100,17 @@ extract_deps() {
   #extract_python3 $runtime_folder
   #extract_dotnet $runtime_folder/dotnet
   #extract_ruby $runtime_folder
+}
+
+patch_cmake_python() {
+  echo set(Python_VERSION 3.10.4)> "$LOC/core/cmake/FindPython.cmake"
+  echo set(Python_ROOT_DIR "$LOC/runtimes/python")>> "$LOC/core/cmake/FindPython.cmake"
+  echo set(Python_EXECUTABLE "$LOC/runtimes/python/python")>> "$LOC/core/cmake/FindPython.cmake"
+  echo set(Python_INCLUDE_DIRS "$LOC/runtimes/python/include")>> "$LOC/core/cmake/FindPython.cmake"
+  echo set(Python_LIBRARIES "$LOC/runtimes/python/libs/python39.lib")>> "$LOC/core/cmake/FindPython.cmake"
+  echo include(FindPackageHandleStandardArgs)>> "$LOC/core/cmake/FindPython.cmake"
+  echo FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python REQUIRED_VARS Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS VERSION_VAR Python_VERSION)>> "$LOC/core/cmake/FindPython.cmake"
+  echo mark_as_advanced(Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS)>> "$LOC/core/cmake/FindPython.cmake"
 }
 
 install_deps() {
