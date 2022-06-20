@@ -103,14 +103,14 @@ extract_deps() {
 }
 
 patch_cmake_python() {
-  echo set(Python_VERSION 3.10.4)> "$LOC/core/cmake/FindPython.cmake"
-  echo set(Python_ROOT_DIR "$LOC/runtimes/python")>> "$LOC/core/cmake/FindPython.cmake"
-  echo set(Python_EXECUTABLE "$LOC/runtimes/python/python")>> "$LOC/core/cmake/FindPython.cmake"
-  echo set(Python_INCLUDE_DIRS "$LOC/runtimes/python/include")>> "$LOC/core/cmake/FindPython.cmake"
-  echo set(Python_LIBRARIES "$LOC/runtimes/python/libs/python39.lib")>> "$LOC/core/cmake/FindPython.cmake"
-  echo include(FindPackageHandleStandardArgs)>> "$LOC/core/cmake/FindPython.cmake"
-  echo FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python REQUIRED_VARS Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS VERSION_VAR Python_VERSION)>> "$LOC/core/cmake/FindPython.cmake"
-  echo mark_as_advanced(Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS)>> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_VERSION 3.10.4)"> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_ROOT_DIR "$LOC/runtimes/python")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_EXECUTABLE \"$LOC/runtimes/python/python\")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_INCLUDE_DIRS \"$LOC/runtimes/python/include\")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_LIBRARIES \"$LOC/runtimes/python/libs/python39.lib\")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "include(FindPackageHandleStandardArgs)">> "$LOC/core/cmake/FindPython.cmake"
+  echo "FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python REQUIRED_VARS Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS VERSION_VAR Python_VERSION)">> "$LOC/core/cmake/FindPython.cmake"
+  echo "mark_as_advanced(Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS)">> "$LOC/core/cmake/FindPython.cmake"
 }
 
 install_deps() {
