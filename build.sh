@@ -57,8 +57,8 @@ download_install_python3(){
   echo "Downloading Python3"
   download "https://www.python.org/ftp/python/3.10.4/python-3.10.4-macos11.pkg" python3.pkg || return 1
   echo "Installing Python3 with Universal pkg file (require sudo)"
-  mkdir -p $LOC/runtimes/python
-  sudo installer -pkg python3.pkg -target $LOC/runtimes/python || error "Python installation failed"
+  mkdir -p "$LOC/runtimes/python"
+  sudo installer -pkg python3.pkg -target "$LOC/runtimes/python" || error "Python installation failed"
 }
 
 download_dotnet(){
