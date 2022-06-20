@@ -6,10 +6,10 @@ jobs:
     steps:
       - name: Checkout upstream MetaCall Distributable MacOS 
         uses: actions/checkout@v3
-      - name: Building MetaCall on MacOS BigSur
       - run: | 
           chmod +x ./build.sh
           ./build.sh
+      - name: Upload build tarball production artifacts
         uses: actions/upload-artifact@v3
         with: 
           name: metacall-tarball
