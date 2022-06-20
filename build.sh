@@ -2,6 +2,10 @@
 set -o nounset # raise error if a var is not defined
 echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
+command -v curl &>/dev/null && CURL_PRESENT=1
+command -v wget &>/dev/null && WGET_PRESENT=2
+echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
+[[ -n "$CURL_PRESENT" ]] || error "CURL is not present and is absolutely required for now."
 MOUNTED_CMAKE_PATH="" # Global for cleanup phase
 UPSTREAM_URL="https://github.com/metacall/core.git" 
 # TODO: Download and add to PATH, dotnet binaries
@@ -16,7 +20,7 @@ CWD="$PWD"
 (mkdir -p "$LOC" && cd "$LOC") || error "cd $LOC failed"
 
 download() {
-  curl -sL "$1 -o $2" || return 1
+  curl -sL "$1" -o "$2" || return 1
 }
 
 get_latest_release() {
@@ -44,7 +48,7 @@ download_cmake() {
 }
 
 check_python3() {
-  for filename in /Applications/*;do
+  for filename in /Applications/* $LOC/runtimes/python/*;do
     if [[ "$filename" =~ "Python".* ]];then # regexp for Python 3.XX
       return 1 # Python is installed
      else 
@@ -58,7 +62,7 @@ download_install_python3(){
   download "https://www.python.org/ftp/python/3.10.4/python-3.10.4-macos11.pkg" python3.pkg || return 1
   echo "Installing Python3 with Universal pkg file (require sudo)"
   mkdir -p "$LOC/runtimes/python"
-  sudo installer -pkg python3.pkg -target "$LOC/runtimes/python" || error "Python installation failed"
+  sudo installer -pkg python3.pkg -target "$LOC/runtimes/python" || error "Python installation failed."
 }
 
 download_dotnet(){
