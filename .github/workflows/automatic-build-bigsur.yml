@@ -33,5 +33,6 @@ jobs:
           echo "print(\"Hello World from Python GitHub Actions\")" > py-eval-test.py
           otool -l ./metacall/metacallcli
           otool -L ./metacall/metacallcli
-          ./metacall/metacallcli py-eval-test.py
-          #metacall.sh py-eval-test.py
+          sudo dtruss metacall/metacallcli py-eval-test.py
+          cd metacall && metacallcli py-eval-test.py
+          metacall.sh py-eval-test.py
