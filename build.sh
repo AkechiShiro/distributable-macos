@@ -118,14 +118,14 @@ patch_cmake_python() {
 }
 
 patch_cmake_ruby() {
-  echo set(Ruby_VERSION 2.4.10)> "$LOC/core/cmake/FindRuby.cmake"
-  echo set(Ruby_ROOT_DIR "$LOC/runtimes/ruby")>> "$LOC/core/cmake/FindRuby.cmake"
-  echo set(Ruby_EXECUTABLE "$LOC/runtimes/ruby/bin/ruby")>> "$LOC/core/cmake/FindRuby.cmake"
-  echo set(Ruby_INCLUDE_DIRS "$LOC/runtimes/ruby/include/;$LOC/runtimes/ruby/include/ruby/")>> "$LOC/core/cmake/FindRuby.cmake"
-  echo set(Ruby_LIBRARY "$LOC/runtimes/ruby/lib/x64-vcruntime140-ruby310.lib")>> "$LOC/core/cmake/FindRuby.cmake"
-  echo include(FindPackageHandleStandardArgs)>> "$LOC/core/cmake/FindRuby.cmake"
-  echo FIND_PACKAGE_HANDLE_STANDARD_ARGS(Ruby REQUIRED_VARS Ruby_EXECUTABLE Ruby_LIBRARY Ruby_INCLUDE_DIRS VERSION_VAR Ruby_VERSION)>> "$LOC/core/cmake/FindRuby.cmake"
-  echo mark_as_advanced(Ruby_EXECUTABLE Ruby_LIBRARY Ruby_INCLUDE_DIRS)>> "$LOC/core/cmake/FindRuby.cmake"
+  echo "set(Ruby_VERSION 2.4.10)" > "$LOC/core/cmake/FindRuby.cmake"
+  echo "set(Ruby_ROOT_DIR $LOC/runtimes/ruby)" >> "$LOC/core/cmake/FindRuby.cmake"
+  echo "set(Ruby_EXECUTABLE $LOC/runtimes/ruby/bin/ruby)" >> "$LOC/core/cmake/FindRuby.cmake"
+  echo "set(Ruby_INCLUDE_DIRS $LOC/runtimes/ruby/include/;$LOC/runtimes/ruby/include/ruby/)" >> "$LOC/core/cmake/FindRuby.cmake"
+  echo "set(Ruby_LIBRARY "$LOC/runtimes/ruby/lib/x64-vcruntime140-ruby310.lib")" >> "$LOC/core/cmake/FindRuby.cmake"
+  echo "include(FindPackageHandleStandardArgs)" >> "$LOC/core/cmake/FindRuby.cmake"
+  echo "FIND_PACKAGE_HANDLE_STANDARD_ARGS(Ruby REQUIRED_VARS Ruby_EXECUTABLE Ruby_LIBRARY Ruby_INCLUDE_DIRS VERSION_VAR Ruby_VERSION)" >> "$LOC/core/cmake/FindRuby.cmake"
+  echo "mark_as_advanced(Ruby_EXECUTABLE Ruby_LIBRARY Ruby_INCLUDE_DIRS)" >> "$LOC/core/cmake/FindRuby.cmake"
 }
 
 install_deps() {
