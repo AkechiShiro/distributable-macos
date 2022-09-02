@@ -3,8 +3,7 @@ set -o nounset # raise error if a var is not defined
 echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
 command -v curl &>/dev/null && CURL_PRESENT=1
-(command -v wget &>/dev/null && WGET_PRESENT=2) || WGET_PRESENT=0
-echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
+echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT"
 [[ -n "$CURL_PRESENT" ]] || error "CURL is not present and is absolutely required for now."
 MOUNTED_CMAKE_PATH="" # Global for cleanup phase
 UPSTREAM_URL="https://github.com/metacall/core.git" 
