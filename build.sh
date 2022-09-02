@@ -3,7 +3,8 @@ set -o nounset # raise error if a var is not defined
 echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
 command -v curl &>/dev/null && CURL_PRESENT=1
-echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT"
+(command -v wget &>/dev/null && WGET_PRESENT=2) || WGET_PRESENT=0
+echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
 [[ -n "$CURL_PRESENT" ]] || error "CURL is not present and is absolutely required for now."
 MOUNTED_CMAKE_PATH="" # Global for cleanup phase
 UPSTREAM_URL="https://github.com/metacall/core.git" 
@@ -17,6 +18,7 @@ error() {
 LOC="$PWD/metacall"
 CWD="$PWD"
 (mkdir -p "$LOC" && cd "$LOC") || error "cd $LOC failed"
+PYTHON_LOC="$LOC/runtimes/python"
 
 download() {
   curl -sL "$1" -o "$2" || return 1
@@ -46,9 +48,17 @@ download_cmake() {
   # TODO: CLEANUP see cleanup functions
 }
 
+check_python3() {
+  for filename in $LOC/runtimes/python/*;do
+    if [[ "$filename" =~ "Python".* ]];then # regexp for Python 3.XX
+      return 1 # Python is installed
+     else 
+      return 0 # Consider no Python installed (ignoring the xcode one for now)
+    fi
+  done
+}
 
 download_install_python3(){
-  PYTHON_LOC="$LOC/runtimes/python"
   mkdir -p "$PYTHON_LOC"
   echo "Downloading Python3"
   cd "$PYTHON_LOC"
@@ -72,7 +82,12 @@ download_dependencies() {
   # DOWNLOAD just about everything, we need for portability.
   mkdir -p "$LOC/dependencies"
   cd "$LOC/dependencies"
-	download_install_python3 || error "Python3 download failed." 
+  #check_python3
+  PYTHON_PRESENT=0
+  echo "Value of Python Present is: $PYTHON_PRESENT"
+  if [[ PYTHON_PRESENT -eq 0 ]];then
+	  download_install_python3 || error "Python3 download failed." 
+  fi
   download_dotnet  || error "Dotnet-sdk download failed"
   download_ruby    || error "Ruby download failed"
   # TODO: Download Dotnet sdk/runtime binaries add to path
@@ -112,11 +127,14 @@ build_meta() {
   cd "$LOC" || error "cd $LOC failed"
   echo "Building MetaCall" 
   if [ ! -d "$LOC/core" ] ; then # if repo does not exist
-    git clone --depth 1 "$UPSTREAM_URL" || error "Git clone metacall/core failed"
+    git clone https://github.com/AkechiShiro/core || error "Git clone metacall/core failed"
   else
     cd "$LOC/core"
     git pull "$UPSTREAM_URL" || error "Git pull failed" # if it does we just pull
   fi
+  cd "$LOC/core"
+  git checkout tweak-macos-rpath || error "Failure to checkout branch tweak-macos-rpath"
+  cd "$LOC"
   patch_cmake_python
   mkdir -p "$LOC/core/build"
   cd "$LOC/core/build" || error "cd $LOC/core/build failed" 
@@ -138,6 +156,7 @@ build_meta() {
     -DCMAKE_INSTALL_PREFIX="$LOC" \
     -G "Unix Makefiles" .. || error "Cmake configuration failed."
   cmake --build . --target install || error "Cmake build target install failed."
+  mv "$PYTHON_LOC/Python.framework/Versions" "$LOC/lib"
 }
 
 make_metacallcli() {
@@ -166,7 +185,6 @@ post_build() {
 	echo "Deleting unecessary temp folders."
 	rm -rf "$LOC/core"
 	rm -rf "$LOC/dependencies"
-	rm -rf "$LOC/runtimes"
 	# TODO: Delete runtimes/dotnet/include & runtimes/python/ if present
 	# TODO: move library dependencies to the correct folders for 
 	# libnode & ruby if needed
