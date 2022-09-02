@@ -3,7 +3,7 @@ set -o nounset # raise error if a var is not defined
 echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
 command -v curl &>/dev/null && CURL_PRESENT=1
-command -v wget &>/dev/null && WGET_PRESENT=2
+(command -v wget &>/dev/null && WGET_PRESENT=2) || WGET_PRESENT=0
 echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
 [[ -n "$CURL_PRESENT" ]] || error "CURL is not present and is absolutely required for now."
 MOUNTED_CMAKE_PATH="" # Global for cleanup phase
@@ -48,7 +48,7 @@ download_cmake() {
 }
 
 check_python3() {
-  for filename in /Applications/* $LOC/runtimes/python/*;do
+  for filename in $LOC/runtimes/python/*;do
     if [[ "$filename" =~ "Python".* ]];then # regexp for Python 3.XX
       return 1 # Python is installed
      else 
@@ -58,11 +58,13 @@ check_python3() {
 }
 
 download_install_python3(){
+  PYTHON_LOC="$LOC/runtimes/python"
+  mkdir -p "$PYTHON_LOC"
   echo "Downloading Python3"
-  download "https://www.python.org/ftp/python/3.10.4/python-3.10.4-macos11.pkg" python3.pkg || return 1
-  echo "Installing Python3 with Universal pkg file (require sudo)"
-  mkdir -p "$LOC/runtimes/python"
-  sudo installer -pkg python3.pkg -target "$LOC/runtimes/python" || error "Python installation failed."
+  cd "$PYTHON_LOC"
+  git clone "https://github.com/gregneagle/relocatable-python" || echo "Make sure that you cloned gregneabgle/relocatable-python"
+  echo "Making Python3 relocatable in $PYTHON_LOC"
+  "$PYTHON_LOC"/relocatable-python/make_relocatable_python_framework.py --destination "$PYTHON_LOC" --python-version 3.7.4 || error "Python 3 relocatable make failed."
 }
 
 download_dotnet(){
@@ -79,9 +81,9 @@ download_dependencies() {
   echo "Downloading dependencies"
   # DOWNLOAD just about everything, we need for portability.
   mkdir -p "$LOC/dependencies"
-  cd "$LOC/dependencies" || error "cd $LOC/dependencies failed"
-  check_python3
-  PYTHON_PRESENT=$?
+  cd "$LOC/dependencies"
+  #check_python3
+  PYTHON_PRESENT=0
   echo "Value of Python Present is: $PYTHON_PRESENT"
   if [[ PYTHON_PRESENT -eq 0 ]];then
 	  download_install_python3 || error "Python3 download failed." 
@@ -107,11 +109,11 @@ extract_deps() {
 }
 
 patch_cmake_python() {
-  echo "set(Python_VERSION 3.10.4)"> "$LOC/core/cmake/FindPython.cmake"
-  echo "set(Python_ROOT_DIR "$LOC/runtimes/python")">> "$LOC/core/cmake/FindPython.cmake"
-  echo "set(Python_EXECUTABLE \"$LOC/runtimes/python/python\")">> "$LOC/core/cmake/FindPython.cmake"
-  echo "set(Python_INCLUDE_DIRS \"$LOC/runtimes/python/include\")">> "$LOC/core/cmake/FindPython.cmake"
-  echo "set(Python_LIBRARIES \"$LOC/runtimes/python/libs/python39.lib\")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_VERSION 3.7.4)"> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_ROOT_DIR "$LOC/runtimes/python/Python.framework")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_EXECUTABLE \"$LOC/runtimes/python/Python.framework/Resources/Python.app/Contents/MacOS/Python\")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_INCLUDE_DIRS \"$LOC/runtimes/python/Python.framework/Versions/Current/include/python3.7m\")">> "$LOC/core/cmake/FindPython.cmake"
+  echo "set(Python_LIBRARIES \"$LOC/runtimes/python/Python.framework/Versions/Current/lib/libpython3.7.dylib\")">> "$LOC/core/cmake/FindPython.cmake"
   echo "include(FindPackageHandleStandardArgs)">> "$LOC/core/cmake/FindPython.cmake"
   echo "FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python REQUIRED_VARS Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS VERSION_VAR Python_VERSION)">> "$LOC/core/cmake/FindPython.cmake"
   echo "mark_as_advanced(Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS)">> "$LOC/core/cmake/FindPython.cmake"
@@ -130,6 +132,7 @@ build_meta() {
     cd "$LOC/core"
     git pull "$UPSTREAM_URL" || error "Git pull failed" # if it does we just pull
   fi
+  patch_cmake_python
   mkdir -p "$LOC/core/build"
   cd "$LOC/core/build" || error "cd $LOC/core/build failed" 
   cmake -Wno-dev \
