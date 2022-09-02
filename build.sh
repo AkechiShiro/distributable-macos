@@ -46,15 +46,6 @@ download_cmake() {
   # TODO: CLEANUP see cleanup functions
 }
 
-check_python3() {
-  for filename in $LOC/runtimes/python/*;do
-    if [[ "$filename" =~ "Python".* ]];then # regexp for Python 3.XX
-      return 1 # Python is installed
-     else 
-      return 0 # Consider no Python installed (ignoring the xcode one for now)
-    fi
-  done
-}
 
 download_install_python3(){
   PYTHON_LOC="$LOC/runtimes/python"
@@ -81,12 +72,7 @@ download_dependencies() {
   # DOWNLOAD just about everything, we need for portability.
   mkdir -p "$LOC/dependencies"
   cd "$LOC/dependencies"
-  #check_python3
-  PYTHON_PRESENT=0
-  echo "Value of Python Present is: $PYTHON_PRESENT"
-  if [[ PYTHON_PRESENT -eq 0 ]];then
-	  download_install_python3 || error "Python3 download failed." 
-  fi
+	download_install_python3 || error "Python3 download failed." 
   download_dotnet  || error "Dotnet-sdk download failed"
   download_ruby    || error "Ruby download failed"
   # TODO: Download Dotnet sdk/runtime binaries add to path
