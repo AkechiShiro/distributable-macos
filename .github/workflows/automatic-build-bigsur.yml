@@ -30,7 +30,8 @@ jobs:
           path: tarball
       - run: | 
           unzip tarball/metacall-tarball-macos-x64.zip
-          sleep 2
           echo "print(\"Hello World from Python GitHub Actions\")" > py-eval-test.py
+          otool -l ./metacall/metacallcli
+          otool -L ./metacall/metacallcli
           ./metacall/metacallcli py-eval-test.py
           #metacall.sh py-eval-test.py
