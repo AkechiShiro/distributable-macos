@@ -3,7 +3,8 @@ set -o nounset # raise error if a var is not defined
 echo "Checking Compiler and Build System"
 command -v cmake &>/dev/null && CMAKE_PRESENT=1
 command -v curl &>/dev/null && CURL_PRESENT=1
-echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT"
+(command -v wget &>/dev/null && WGET_PRESENT=2) || WGET_PRESENT=0
+echo "CMAKE:$CMAKE_PRESENT,CURL:$CURL_PRESENT,WGET:$WGET_PRESENT"
 [[ -n "$CURL_PRESENT" ]] || error "CURL is not present and is absolutely required for now."
 MOUNTED_CMAKE_PATH="" # Global for cleanup phase
 UPSTREAM_URL="https://github.com/metacall/core.git" 
@@ -18,6 +19,7 @@ LOC="$PWD/metacall"
 CWD="$PWD"
 (mkdir -p "$LOC" && cd "$LOC") || error "cd $LOC failed"
 PYTHON_LOC="$LOC/runtimes/python"
+RUBY_LOC="$LOC/runtimes/ruby"
 
 download() {
   curl -sL "$1" -o "$2" || return 1
@@ -72,7 +74,7 @@ download_dotnet(){
 }
 download_ruby(){
   echo "Downloading Ruby" && return 0
-  download "" ruby || return 1
+  mkdir -p "$RUBY_LOC"
 }
 
 
@@ -96,12 +98,10 @@ download_dependencies() {
 
 extract_deps() {
   declare runtime_folder="$1"
-  mkdir -p "$runtime_folder"
-  echo "Extracting archives"
-  mkdir -p "$LOC/runtimes/ruby"
-  #mkdir -p "$LOC/runtimes/python"
-  mkdir -p "$LOC/runtimes/dotnet"
-  mkdir -p "$LOC/runtimes/nodejs"
+  #mkdir -p "$runtime_folder"
+  #echo "Extracting archives"
+  #mkdir -p "$LOC/runtimes/ruby"
+  #mkdir -p "$LOC/runtimes/dotnet"
   #extract_python3 $runtime_folder
   #extract_dotnet $runtime_folder/dotnet
   #extract_ruby $runtime_folder
@@ -116,6 +116,17 @@ patch_cmake_python() {
   echo "include(FindPackageHandleStandardArgs)">> "$LOC/core/cmake/FindPython.cmake"
   echo "FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python REQUIRED_VARS Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS VERSION_VAR Python_VERSION)">> "$LOC/core/cmake/FindPython.cmake"
   echo "mark_as_advanced(Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS)">> "$LOC/core/cmake/FindPython.cmake"
+}
+
+patch_cmake_ruby() {
+  echo set(Ruby_VERSION 2.4.10)> "$LOC/core/cmake/FindRuby.cmake"
+  echo set(Ruby_ROOT_DIR "$LOC/runtimes/ruby")>> "$LOC/core/cmake/FindRuby.cmake"
+  echo set(Ruby_EXECUTABLE "$LOC/runtimes/ruby/bin/ruby")>> "$LOC/core/cmake/FindRuby.cmake"
+  echo set(Ruby_INCLUDE_DIRS "$LOC/runtimes/ruby/include/;$LOC/runtimes/ruby/include/ruby/")>> "$LOC/core/cmake/FindRuby.cmake"
+  echo set(Ruby_LIBRARY "$LOC/runtimes/ruby/lib/x64-vcruntime140-ruby310.lib")>> "$LOC/core/cmake/FindRuby.cmake"
+  echo include(FindPackageHandleStandardArgs)>> "$LOC/core/cmake/FindRuby.cmake"
+  echo FIND_PACKAGE_HANDLE_STANDARD_ARGS(Ruby REQUIRED_VARS Ruby_EXECUTABLE Ruby_LIBRARY Ruby_INCLUDE_DIRS VERSION_VAR Ruby_VERSION)>> "$LOC/core/cmake/FindRuby.cmake"
+  echo mark_as_advanced(Ruby_EXECUTABLE Ruby_LIBRARY Ruby_INCLUDE_DIRS)>> "$LOC/core/cmake/FindRuby.cmake"
 }
 
 install_deps() {
@@ -174,7 +185,7 @@ cleanup() { # TODO: Put right when we don't need anymore lots of files
 
 make_tarball() {
 	cd "$CWD" || error "cd $CWD failed"
-	echo "Compressing Tarball"
+	echo "Compressing tarball/zip"
 	cmake -E tar "cf" "$CWD/metacall-tarball-macos-x64.zip" --format=zip "$LOC" "$CWD/metacall.sh"
 	echo "Tarball compressed successfully."
 	return 0
