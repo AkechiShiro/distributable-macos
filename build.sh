@@ -141,8 +141,6 @@ build_meta() {
     cd "$LOC/core"
     git pull "$UPSTREAM_URL" || error "Git pull failed" # if it does we just pull
   fi
-  cd "$LOC/core"
-  git checkout tweak-macos-rpath || error "Failure to checkout branch tweak-macos-rpath"
   cd "$LOC"
   patch_cmake_python
   mkdir -p "$LOC/core/build"
