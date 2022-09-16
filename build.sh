@@ -136,7 +136,7 @@ build_meta() {
   cd "$LOC" || error "cd $LOC failed"
   echo "Building MetaCall" 
   if [ ! -d "$LOC/core" ] ; then # if repo does not exist
-    git clone https://github.com/AkechiShiro/core || error "Git clone metacall/core failed"
+    git clone https://github.com/metacall/core || error "Git clone metacall/core failed"
   else
     cd "$LOC/core"
     git pull "$UPSTREAM_URL" || error "Git pull failed" # if it does we just pull
@@ -155,13 +155,13 @@ build_meta() {
     -DOPTION_BUILD_TESTS=OFF \
     -DOPTION_BUILD_EXAMPLES=OFF \
     -DOPTION_BUILD_LOADERS_PY=ON \
-    -DOPTION_BUILD_LOADERS_NODE=OFF \
+    -DOPTION_BUILD_LOADERS_NODE=ON \
     -DOPTION_BUILD_LOADERS_CS=OFF \
     -DOPTION_BUILD_LOADERS_RB=OFF \
     -DOPTION_BUILD_LOADERS_TS=OFF \
     -DOPTION_BUILD_PORTS=ON \
     -DOPTION_BUILD_PORTS_PY=ON \
-    -DOPTION_BUILD_PORTS_NODE=OFF \
+    -DOPTION_BUILD_PORTS_NODE=ON \
     -DCMAKE_INSTALL_PREFIX="$LOC" \
     -G "Unix Makefiles" .. || error "Cmake configuration failed."
   cmake --build . --target install || error "Cmake build target install failed."
