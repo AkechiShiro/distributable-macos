@@ -2,7 +2,7 @@ name: MacOSX BigSur MetaCall build
 on: [push]
 jobs:
   build-action:
-    runs-on: macos-10.15
+    runs-on: macos-latest
     steps:
       - name: Checkout upstream MetaCall Distributable MacOS 
         uses: actions/checkout@v3
