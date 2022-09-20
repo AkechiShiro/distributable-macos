@@ -141,10 +141,24 @@ build_meta() {
     cd "$LOC/core"
     git pull "$UPSTREAM_URL" || error "Git pull failed" # if it does we just pull
   fi
-  cd "$LOC"
+  cd "$LOC" || error "cd $LOC failed"
   patch_cmake_python
   mkdir -p "$LOC/core/build"
   cd "$LOC/core/build" || error "cd $LOC/core/build failed" 
+  # Install Python certificates
+  bash /Applications/Python\ 3*/Install\ Certificates.command
+  bash /Applications/Python\ 3*/Update\ Shell\ Profile.command
+
+  # Install XCode dependencies
+  sudo xcode-select --install
+  sudo xcode-select --switch /Library/Developer/CommandLineTools
+
+  # Export compiler options
+  export SDKROOT=$(xcrun --show-sdk-path)
+  export MACOSX_DEPLOYMENT_TARGET=''
+  export CC=$(xcrun --find clang)
+  export CXX=$(xcrun --find clang++)
+  export CFLAGS="-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/"
   cmake -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DOPTION_BUILD_SECURITY=OFF \
