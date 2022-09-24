@@ -170,6 +170,7 @@ build_meta() {
 		-DOPTION_BUILD_PORTS=ON \
 		-DOPTION_BUILD_PORTS_PY=ON \
 		-DOPTION_BUILD_PORTS_NODE=ON \
+		-DNodeJS_INSTALL_PREFIX="/tmp" \
 		-DCMAKE_INSTALL_PREFIX="$LOC" \
 		-G "Unix Makefiles" .. || error "Cmake configuration failed."
 
