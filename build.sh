@@ -136,6 +136,7 @@ git_clone() {
 	# Used for dev purposes
 	if [[ ! -z "$BRANCH" ]]; then # If branch is defined then we checkout in the branch
 		cd "$LOC/core"
+		PAGER= git branch -l
 		git checkout "$BRANCH"
 	fi
 }
