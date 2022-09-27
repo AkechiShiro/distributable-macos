@@ -128,16 +128,13 @@ git_clone() {
 	declare URL="$1" BRANCH="$2"
 	# Clone repo
 	if [[ ! -d "$LOC/core" ]] ; then # if repo does not exist
-		git clone --depth 1 "$URL" || error "Git clone metacall/core failed"
+		# Used for dev purposes
+		if [[ ! -z "$BRANCH" ]]; then # If branch is defined then we checkout in the branch
+			git clone --depth 1 -b "$BRANCH" "$URL" || error "Git clone metacall/core failed"
+		fi
 	else
 		cd "$LOC/core"
 		git pull "$URL" || error "Git pull failed" # if it does we just pull
-	fi
-	# Used for dev purposes
-	if [[ ! -z "$BRANCH" ]]; then # If branch is defined then we checkout in the branch
-		cd "$LOC/core"
-		PAGER= git branch -l
-		git checkout "$BRANCH"
 	fi
 }
 
