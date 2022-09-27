@@ -2,7 +2,7 @@ name: MacOS MetaCall build
 on: [push]
 jobs:
   build-action:
-    runs-on: macos-10.15
+    runs-on: macos-12
     steps:
       - name: clone & build MetaCall Distributable MacOS 
         uses: actions/checkout@v3
