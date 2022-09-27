@@ -124,6 +124,22 @@ patch_cmake_ruby() {
   echo "mark_as_advanced(Ruby_EXECUTABLE Ruby_LIBRARY Ruby_INCLUDE_DIRS)" >> "$LOC/core/cmake/FindRuby.cmake"
 }
 
+git_clone() {
+	declare URL="$1" BRANCH="$2"
+	# Clone repo
+	if [[ ! -d "$LOC/core" ]] ; then # if repo does not exist
+		git clone --depth 1 "$URL" || error "Git clone metacall/core failed"
+	else
+		cd "$LOC/core"
+		git pull "$URL" || error "Git pull failed" # if it does we just pull
+	fi
+	# Used for dev purposes
+	if [[ ! -z "$BRANCH" ]]; then # If branch is defined then we checkout in the branch
+		cd "$LOC/core"
+		git checkout "$BRANCH"
+	fi
+}
+
 build_meta() {
 	cd "$LOC" || error "cd $LOC failed"
 	echo "Building MetaCall" 
@@ -143,12 +159,7 @@ build_meta() {
 	export CXX=$(xcrun --find clang++)
 
 	# Clone repo
-	if [ ! -d "$LOC/core" ] ; then # if repo does not exist
-		git clone --depth 1 "$UPSTREAM_URL" || error "Git clone metacall/core failed"
-	else
-		cd "$LOC/core"
-		git pull "$UPSTREAM_URL" || error "Git pull failed" # if it does we just pull
-	fi
+	git_clone "https://github.com/akechishiro/core" "node-js-debugging"
 
 	# Create build folder
 	mkdir -p "$LOC/core/build"
