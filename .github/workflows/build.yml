@@ -2,7 +2,7 @@ name: MacOSX MetaCall build & tests
 on: [push]
 jobs:
   build-action:
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - name: clone & build metacall core repo distributable MacOS 
         uses: actions/checkout@v3
